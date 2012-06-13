@@ -823,6 +823,11 @@ static void handle_connect(struct ev_loop *loop, ev_io *w, int revents) {
 				 "TCP4",
 				 inet_ntoa(addr->sin_addr),
 				 ntohs(addr->sin_port));
+		    printf( RING_DATA_LEN,
+				 tcp_proxy_line,
+				 "TCP4",
+				 inet_ntoa(addr->sin_addr),
+                 ntohs(addr->sin_port));
 	    }
 	    else if (ps->remote_ip.ss_family == AF_INET6) {
 	      struct sockaddr_in6* addr = (struct sockaddr_in6*)&ps->remote_ip;
@@ -833,6 +838,11 @@ static void handle_connect(struct ev_loop *loop, ev_io *w, int revents) {
 				 "TCP6",
 				 tcp6_address_string,
 				 ntohs(addr->sin6_port));
+		    printf( RING_DATA_LEN,
+				 tcp_proxy_line,
+				 "TCP6",
+				 tcp6_address_string,
+                 ntohs(addr->sin6_port));
 	    }   
             ringbuffer_write_append(&ps->ring_down, written);
             ev_io_start(loop, &ps->ev_w_down);
@@ -856,6 +866,7 @@ static void handle_connect(struct ev_loop *loop, ev_io *w, int revents) {
     }
     else if (errno == EINPROGRESS || errno == EINTR || errno == EALREADY) {
         /* do nothing, we'll get phoned home again... */
+        log_err_ps(ps, "do nothing, we'll get phoned home again: %s", strerror(errno));
     }
     else {
         log_err_ps(ps, "Error connecting to backend: %s", strerror(errno));
