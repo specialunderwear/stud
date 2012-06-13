@@ -814,36 +814,27 @@ static void handle_connect(struct ev_loop *loop, ev_io *w, int revents) {
         if (CONFIG->WRITE_PROXY_LINE) {
             char *ring_pnt = ringbuffer_write_ptr(&ps->ring_down);
             assert(ps->remote_ip.ss_family == AF_INET ||
-		   ps->remote_ip.ss_family == AF_INET6);
-	    if(ps->remote_ip.ss_family == AF_INET) {
-	      struct sockaddr_in* addr = (struct sockaddr_in*)&ps->remote_ip;
-	      written = snprintf(ring_pnt,
-				 RING_DATA_LEN,
-				 tcp_proxy_line,
-				 "TCP4",
-				 inet_ntoa(addr->sin_addr),
-				 ntohs(addr->sin_port));
-		    printf( RING_DATA_LEN,
-				 tcp_proxy_line,
-				 "TCP4",
-				 inet_ntoa(addr->sin_addr),
-                 ntohs(addr->sin_port));
-	    }
-	    else if (ps->remote_ip.ss_family == AF_INET6) {
-	      struct sockaddr_in6* addr = (struct sockaddr_in6*)&ps->remote_ip;
-	      inet_ntop(AF_INET6,&(addr->sin6_addr),tcp6_address_string,INET6_ADDRSTRLEN);
-	      written = snprintf(ring_pnt,
-				 RING_DATA_LEN,
-				 tcp_proxy_line,
-				 "TCP6",
-				 tcp6_address_string,
-				 ntohs(addr->sin6_port));
-		    printf( RING_DATA_LEN,
-				 tcp_proxy_line,
-				 "TCP6",
-				 tcp6_address_string,
-                 ntohs(addr->sin6_port));
-	    }   
+                ps->remote_ip.ss_family == AF_INET6);
+            if(ps->remote_ip.ss_family == AF_INET) {
+                struct sockaddr_in* addr = (struct sockaddr_in*)&ps->remote_ip;
+                written = snprintf(ring_pnt,
+                    RING_DATA_LEN,
+                    tcp_proxy_line,
+                    "TCP4",
+                    inet_ntoa(addr->sin_addr),
+                    ntohs(addr->sin_port));
+            }
+            else if (ps->remote_ip.ss_family == AF_INET6) {
+                struct sockaddr_in6* addr = (struct sockaddr_in6*)&ps->remote_ip;
+                inet_ntop(AF_INET6,&(addr->sin6_addr),tcp6_address_string,INET6_ADDRSTRLEN);
+                written = snprintf(ring_pnt,
+                    RING_DATA_LEN,
+                    tcp_proxy_line,
+                    "TCP6",
+                    tcp6_address_string,
+                    ntohs(addr->sin6_port));
+            }
+            log_debug_ps(ps, "adding proxy header: %s", ring_pnt);
             ringbuffer_write_append(&ps->ring_down, written);
             ev_io_start(loop, &ps->ev_w_down);
         }
